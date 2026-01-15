@@ -13,12 +13,11 @@ class MyEventEmitter {
     return this;
   }
   once(event, cb) {
-    const wrapper = (...args) => {
-      cb(...args);
-      this.off(event, wrapper);
-    };
+    if (!this.#listeners[event]) {
+      this.#listeners[event] = [];
+    }
 
-    this.on(event, wrapper);
+    this.#listeners[event].push({ cb, once: true });
 
     return this;
   }
@@ -65,7 +64,7 @@ class MyEventEmitter {
   }
   prependOnceListener(event, cb) {
     if (!this.#listeners[event]) {
-      this.on(event, cb);
+      this.#listeners[event] = [];
     }
 
     this.#listeners[event].unshift({ cb, once: true });
